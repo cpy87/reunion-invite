@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>You're Invited — Friends Reunion, Batch 2002</title>
-<meta name="description" content="Friends Reunion, Batch 2002, GBPS. 2 October 2026 at Garv Hotel and Resort.">
+<meta name="description" content="Friends Reunion, Batch 2002, GBPS. 2 October 2026 at Garv Hotel and Resort, Gaya ji.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -64,13 +64,12 @@
 
   /* ---------- shared screen shell ---------- */
   .screen{
-    height: 100dvh;
+    min-height: 100dvh;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 16px 20px;
-    overflow-y: auto;
   }
 
   /* ================= GATE SCREEN ================= */
@@ -298,6 +297,71 @@
     transform: translate(-50%, -50%) scale(.4);
   }
 
+  /* ================= SCROLL PROMPT ================= */
+  .scroll-prompt-screen{
+    background:
+      radial-gradient(circle at 50% 30%, rgba(201,162,39,0.14), transparent 55%),
+      linear-gradient(180deg, var(--ink) 0%, var(--ink-deep) 100%);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .scroll-prompt-screen.show{
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .scroll-prompt-inner{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .scroll-kicker{
+    margin: 0;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    color: var(--gold-light);
+  }
+
+  .scroll-message{
+    margin: 0;
+    max-width: 22ch;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.3rem, 6.5vw, 1.7rem);
+    line-height: 1.35;
+    color: var(--cream);
+  }
+
+  .scroll-down-btn{
+    margin-top: 10px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid rgba(232,217,160,0.4);
+    background: rgba(232,217,160,0.08);
+    color: var(--gold-light);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: bounceDown 1.8s ease-in-out infinite;
+    transition: background .15s ease;
+  }
+  .scroll-down-btn:hover{ background: rgba(232,217,160,0.18); }
+
+  @keyframes bounceDown{
+    0%, 100%{ transform: translateY(0); }
+    50%{ transform: translateY(8px); }
+  }
+
   /* ================= INVITE SCREEN ================= */
   .invite-screen{
     background:
@@ -508,6 +572,16 @@
   </div>
 </div>
 
+<section id="scroll-prompt" class="screen scroll-prompt-screen" hidden>
+  <div class="scroll-prompt-inner">
+    <p class="scroll-kicker">Your invitation has arrived</p>
+    <p class="scroll-message">Scroll down to step inside</p>
+    <button type="button" class="scroll-down-btn" id="scroll-down-btn" aria-label="Scroll down to see your invitation">
+      <span aria-hidden="true">⌄</span>
+    </button>
+  </div>
+</section>
+
 <main id="invite" class="screen invite-screen" hidden>
   <article class="invite-card">
     <div class="invite-photo">
@@ -525,7 +599,7 @@
         </div>
         <div class="detail-row">
           <dt>Venue</dt>
-          <dd>Garv Hotel and Resort</dd>
+          <dd>Garv Hotel and Resort, Gaya ji</dd>
         </div>
       </dl>
 
@@ -555,6 +629,8 @@
   var guestNameEl = document.getElementById('guest-name');
   var countdownEl = document.getElementById('countdown');
   var icsBtn = document.getElementById('ics-btn');
+  var scrollPrompt = document.getElementById('scroll-prompt');
+  var scrollDownBtn = document.getElementById('scroll-down-btn');
 
   var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -564,12 +640,38 @@
     return trimmed.length > 60 ? trimmed.slice(0, 60) : trimmed;
   }
 
-  function showInvite(name){
+  function watchInviteReveal(){
+    if('IntersectionObserver' in window){
+      var observer = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){
+            inviteScreen.classList.add('show');
+            observer.disconnect();
+          }
+        });
+      }, { threshold: 0.15 });
+      observer.observe(inviteScreen);
+    } else {
+      inviteScreen.classList.add('show');
+    }
+  }
+
+  function showScrollPrompt(name){
     guestNameEl.textContent = name;
     document.title = "You're invited, " + name + " \u2014 Batch 2002 Reunion";
+
     inviteScreen.hidden = false;
+    watchInviteReveal();
+
+    scrollPrompt.hidden = false;
     requestAnimationFrame(function(){
-      inviteScreen.classList.add('show');
+      scrollPrompt.classList.add('show');
+    });
+  }
+
+  if(scrollDownBtn){
+    scrollDownBtn.addEventListener('click', function(){
+      inviteScreen.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
     });
   }
 
@@ -582,7 +684,7 @@
     if(prefersReduced){
       setTimeout(function(){
         gate.hidden = true;
-        showInvite(name);
+        showScrollPrompt(name);
       }, 250);
       return;
     }
@@ -592,7 +694,7 @@
       if(revealed) return;
       revealed = true;
       envelopeStage.classList.add('fade-out');
-      showInvite(name);
+      showScrollPrompt(name);
       setTimeout(function(){
         envelopeStage.hidden = true;
       }, 500);
@@ -651,7 +753,7 @@
         'DTSTART;VALUE=DATE:20261002',
         'DTEND;VALUE=DATE:20261003',
         'SUMMARY:Friends Reunion, Batch 2002, GBPS',
-        'LOCATION:Garv Hotel and Resort',
+        'LOCATION:Garv Hotel and Resort\, Gaya ji',
         "DESCRIPTION:Let's rewind the clock and relive the golden days!",
         'END:VEVENT',
         'END:VCALENDAR'
