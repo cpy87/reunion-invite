@@ -585,6 +585,17 @@
       return;
     }
 
+    var revealed = false;
+    function revealInvite(){
+      if(revealed) return;
+      revealed = true;
+      envelopeStage.classList.add('fade-out');
+      showInvite(name);
+      setTimeout(function(){
+        envelopeStage.hidden = true;
+      }, 500);
+    }
+
     setTimeout(function(){
       gate.hidden = true;
       envelopeStage.hidden = false;
@@ -597,14 +608,11 @@
         envelope.classList.add('rising');
       }, 750);
 
-      setTimeout(function(){
-        envelopeStage.classList.add('fade-out');
-        showInvite(name);
-      }, 1650);
+      setTimeout(revealInvite, 1650);
 
-      setTimeout(function(){
-        envelopeStage.hidden = true;
-      }, 2150);
+      // Safety net: no matter what happens above, guarantee the invite
+      // card appears within 3 seconds so the user is never stuck.
+      setTimeout(revealInvite, 3000);
 
     }, 300);
   });
