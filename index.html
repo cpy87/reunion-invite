@@ -64,12 +64,13 @@
 
   /* ---------- shared screen shell ---------- */
   .screen{
-    min-height: 100dvh;
+    height: 100dvh;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 32px 20px;
+    padding: 16px 20px;
+    overflow-y: auto;
   }
 
   /* ================= GATE SCREEN ================= */
@@ -322,7 +323,8 @@
 
   .invite-photo{
     position: relative;
-    margin: 18px 18px 0;
+    width: clamp(120px, 38vw, 180px);
+    margin: 16px auto 0;
     border-radius: 12px;
     overflow: hidden;
     aspect-ratio: 1 / 1;
@@ -352,7 +354,7 @@
   }
 
   .invite-body{
-    padding: 22px 26px 6px;
+    padding: 12px 22px 4px;
     text-align: center;
   }
 
@@ -377,14 +379,14 @@
 
   .invite-details{
     list-style: none;
-    margin: 24px 0 0;
+    margin: 14px 0 0;
     padding: 0;
   }
   .detail-row{
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    padding: 13px 2px;
+    padding: 8px 2px;
   }
   .detail-row + .detail-row{
     border-top: 1px dashed rgba(124,44,44,0.25);
@@ -406,7 +408,7 @@
   }
 
   .invite-extras{
-    margin-top: 20px;
+    margin-top: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -441,25 +443,25 @@
 
   .stub-divider{
     position: relative;
-    height: 22px;
-    margin: 26px 0 0;
+    height: 16px;
+    margin: 12px 0 0;
     border-top: 2px dashed rgba(43,36,32,0.18);
   }
   .stub-divider::before,
   .stub-divider::after{
     content: "";
     position: absolute;
-    top: -11px;
-    width: 22px;
-    height: 22px;
+    top: -8px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: var(--ink-deep);
   }
-  .stub-divider::before{ left: -11px; }
-  .stub-divider::after{ right: -11px; }
+  .stub-divider::before{ left: -8px; }
+  .stub-divider::after{ right: -8px; }
 
   .invite-footer{
-    padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
     text-align: center;
     background: linear-gradient(135deg, var(--ink), var(--ink-deep));
   }
